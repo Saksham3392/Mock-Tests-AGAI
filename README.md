@@ -4,6 +4,19 @@ An interactive, in-browser coding platform and Python execution playground featu
 
 ---
 
+### 🌐 Live Interactive Demo
+Experience the platform in action directly in your browser without local setup:  
+👉 **https://mock-tests-agai.onrender.com**
+
+And to view in localhost offline
+```cmd
+cd /d "c:\Users\Asus\Desktop\Tests AGAI" && python server.py
+```
+
+---
+
+---
+
 ## 🚀 Features
 
 - **⚡ In-Browser Python WASM Engine (Pyodide)**:
