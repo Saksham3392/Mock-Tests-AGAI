@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Practice Questions - AI & LLM Systems Arena</title>
+
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            warmBg: '#faf6eb',
+            warmPanel: '#f3ecdb',
+            warmCard: '#fdfbf7',
+            warmBorder: '#dfd5c0',
+            warmBorderDark: '#ccbfab',
+            warmHover: '#ebe3cf',
+            warmText: '#2d271e',
+            warmTextSecondary: '#5f5748',
+            warmMuted: '#857966',
+            warmAccent: '#b45309',
+            warmAccentDark: '#92400e',
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+
+  <!-- KaTeX for Mathematical Formula Rendering -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/contrib/auto-render.min.js"></script>
+
+  <!-- Marked.js for Markdown -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/11.1.1/marked.min.js"></script>
+
+  <!-- Split.js for Resizable Grid Panes -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/split.js/1.6.5/split.min.js"></script>
+
+  <!-- Pyodide (Python 3 WASM in browser) -->
+  <script src="https://cdn.jsdelivr.net/pyodide/v0.25.0/full/pyodide.js"></script>
+
+  <!-- Monaco Editor AMD Loader -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.45.0/min/vs/loader.min.js"></script>
+
+  <!-- Highlight.js for Colorful Syntax Highlighted Code Blocks -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/python.min.js"></script>
+
+  <!-- Custom Stylesheet -->
+  <link rel="stylesheet" href="style.css?v=36.0" />
+</head>
+
+<body class="bg-warmBg text-warmText flex flex-col h-screen overflow-hidden">
+
+  <!-- ================= SLIDEBAR DRAWER & OVERLAY ================= -->
+  <div id="slidebar-overlay"></div>
+
+  <aside id="slidebar">
+    <!-- Slidebar Header -->
+    <div class="h-14 px-4 bg-warmPanel border-b border-warmBorder flex items-center justify-between shrink-0">
+      <div class="flex items-center space-x-2">
+        <i class="fa-solid fa-bars-staggered text-warmAccent"></i>
+        <h2 class="text-sm font-bold text-warmText">Tests & Questions</h2>
+      </div>
+      <button id="close-slidebar-btn" class="p-1.5 rounded-md hover:bg-warmHover text-warmTextSecondary hover:text-warmText transition" title="Close Slidebar">
+        <i class="fa-solid fa-xmark text-sm"></i>
+      </button>
+    </div>
+
+    <!-- Slidebar Search & Filter Controls -->
+    <div class="p-3 border-b border-warmBorder bg-warmBg space-y-2 shrink-0">
+      <!-- Search Input -->
+      <div class="relative">
+        <i class="fa-solid fa-magnifying-glass absolute left-2.5 top-1/2 -translate-y-1/2 text-warmMuted text-xs"></i>
+        <input id="slidebar-search-input" type="text" placeholder="Search 17 questions, topics..." class="w-full pl-8 pr-3 py-1.5 text-xs bg-warmCard border border-warmBorder rounded-lg text-warmText placeholder-warmMuted focus:outline-none focus:border-warmAccent transition" />
+      </div>
+
+      <!-- Quick Filter Pills -->
+      <div class="flex items-center space-x-1">
+        <button id="slidebar-filter-all" class="slidebar-filter-btn active flex-1 py-1 text-[11px] font-bold rounded-md text-center transition cursor-pointer" title="Show All 17 Questions">
+          All (17)
+        </button>
+        <button id="slidebar-filter-test1" class="slidebar-filter-btn flex-1 py-1 text-[11px] font-semibold rounded-md text-center transition cursor-pointer" title="Filter Test 1 (6 Problems)">
+          Test 1 (6)
+        </button>
+        <button id="slidebar-filter-test2" class="slidebar-filter-btn flex-1 py-1 text-[11px] font-semibold rounded-md text-center transition cursor-pointer" title="Filter Test 2 (6 Questions)">
+          Test 2 (6)
+        </button>
+        <button id="slidebar-filter-test3" class="slidebar-filter-btn flex-1 py-1 text-[11px] font-semibold rounded-md text-center transition cursor-pointer" title="Filter Test 3 (5 Questions)">
+          Test 3 (5)
+        </button>
+      </div>
+    </div>
+
+    <!-- Slidebar Dynamic Question List -->
+    <div id="slidebar-content" class="flex-1 overflow-y-auto p-4 space-y-5">
+      <!-- Injected dynamically by renderSlidebar() -->
+    </div>
+
+    <!-- Slidebar Footer with Progress Bar -->
+    <div class="p-3 bg-warmPanel border-t border-warmBorder shrink-0">
+      <div class="flex items-center justify-between text-[11px] font-semibold text-warmTextSecondary mb-1.5">
+        <span>Overall Solved</span>
+        <span id="slidebar-progress-count">0 / 17 Solved</span>
+      </div>
+      <div class="w-full bg-warmBorder/60 h-2 rounded-full overflow-hidden">
+        <div id="slidebar-progress-bar" class="bg-emerald-600 h-full rounded-full transition-all duration-300" style="width: 0%;"></div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ================= TOP NAVIGATION BAR ================= -->
+  <header class="h-14 bg-warmPanel border-b border-warmBorder flex items-center justify-between px-4 z-30 shrink-0">
+    <!-- Left: Slidebar toggle & Brand -->
+    <div class="flex items-center space-x-3">
+      <!-- Slidebar Toggle Button -->
+      <button id="slidebar-toggle-btn" class="px-2.5 py-1.5 rounded-lg bg-warmCard hover:bg-warmHover border border-warmBorder text-warmText text-xs font-semibold flex items-center space-x-1.5 transition shadow-sm cursor-pointer" title="Open Slidebar">
+        <i class="fa-solid fa-bars text-warmAccent"></i>
+        <span>Slidebar</span>
+      </button>
+
+      <div class="h-5 w-px bg-warmBorder"></div>
+
+      <div>
+        <h1 class="text-sm font-bold tracking-tight text-warmText flex items-center space-x-2">
+          <span>AI Systems Lab</span>
+          <span class="text-[11px] bg-amber-100 text-amber-900 px-2 py-0.5 rounded border border-amber-300 font-medium">Night Shift (Light)</span>
+        </h1>
+      </div>
+    </div>
+
+    <!-- Center: Status & Reset -->
+    <div class="flex items-center space-x-2">
+      <span id="q-status-badge" class="text-xs px-2.5 py-0.5 rounded-full bg-warmCard text-warmTextSecondary border border-warmBorder font-medium">
+        Unattempted
+      </span>
+
+      <!-- Reset All Progress Button -->
+      <button id="reset-all-btn" class="px-2.5 py-1 rounded-lg bg-rose-50 hover:bg-rose-100 border border-rose-200 text-rose-800 text-xs font-semibold flex items-center space-x-1.5 transition" title="Reset all progress and stored code">
+        <i class="fa-solid fa-arrows-rotate text-[10px]"></i>
+        <span>Reset</span>
+      </button>
+    </div>
+
+    <!-- Right: Engine Status & Actions -->
+    <div class="flex items-center space-x-3">
+      <!-- Engine Status Pill -->
+      <div id="engine-status" class="flex items-center space-x-1.5 px-2.5 py-1 rounded-full bg-amber-100 border border-amber-300 text-amber-900 text-xs font-medium">
+        <span class="w-2 h-2 rounded-full bg-amber-500"></span>
+        <span id="engine-status-text">Booting Python...</span>
+      </div>
+
+      <!-- Run Button -->
+      <button id="run-code-btn" class="px-3 py-1.5 rounded-lg bg-warmCard hover:bg-warmHover border border-warmBorder text-sky-800 text-xs font-semibold flex items-center space-x-1.5 transition shadow-sm" title="Run active test case (Shift+Enter)">
+        <i class="fa-solid fa-play text-[10px]"></i>
+        <span>Run</span>
+        <kbd class="hidden md:inline-block text-[9px] bg-warmPanel px-1 rounded text-warmMuted border border-warmBorder">Shift+↵</kbd>
+      </button>
+
+      <!-- Submit Button -->
+      <button id="submit-code-btn" class="px-3.5 py-1.5 rounded-lg bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-bold flex items-center space-x-1.5 transition shadow-sm" title="Submit all test cases (Ctrl+Enter)">
+        <i class="fa-solid fa-check-double text-xs"></i>
+        <span>Submit</span>
+        <kbd class="hidden md:inline-block text-[9px] bg-emerald-800 px-1 rounded text-emerald-100">Ctrl+↵</kbd>
+      </button>
+    </div>
+  </header>
+
+  <!-- ================= TEST TABS BAR ================= -->
+  <nav class="h-10 bg-warmPanel border-b border-warmBorder flex items-center justify-between px-4 shrink-0">
+    <div class="flex items-center space-x-2">
+      <!-- Test Switcher Pills -->
+      <div class="flex items-center bg-warmCard p-0.5 rounded-lg border border-warmBorder space-x-1">
+        <button id="test-pill-test1" class="px-2.5 py-1 text-xs font-bold rounded-md transition flex items-center gap-1.5 bg-amber-200 text-amber-950 border border-amber-400 shadow-xs cursor-pointer" title="Switch to Test 1 (Practice Questions)">
+          <i class="fa-solid fa-flask text-warmAccent"></i>
+          <span>Test 1</span>
+        </button>
+        <button id="test-pill-test2" class="px-2.5 py-1 text-xs font-semibold rounded-md transition flex items-center gap-1.5 text-warmTextSecondary hover:text-warmText hover:bg-warmHover cursor-pointer" title="Switch to Test 2 (Sample Questions)">
+          <i class="fa-solid fa-brain text-warmMuted"></i>
+          <span>Test 2</span>
+        </button>
+        <button id="test-pill-test3" class="px-2.5 py-1 text-xs font-semibold rounded-md transition flex items-center gap-1.5 text-warmTextSecondary hover:text-warmText hover:bg-warmHover cursor-pointer" title="Switch to Test 3 (Test Questions)">
+          <i class="fa-solid fa-cubes text-warmMuted"></i>
+          <span>Test 3</span>
+        </button>
+      </div>
+
+      <!-- Divider -->
+      <div class="h-4 w-px bg-warmBorder mx-1"></div>
+
+      <!-- Question Tabs for active Test -->
+      <div id="top-question-tabs" class="flex items-center space-x-1 overflow-x-auto">
+        <!-- Rendered dynamically by app.js -->
+      </div>
+    </div>
+
+    <div class="flex items-center space-x-2 text-xs text-warmTextSecondary">
+      <span id="question-progress-counter" class="font-medium">Test 1 · Problem 1 of 6</span>
+    </div>
+  </nav>
+
+  <!-- ================= MAIN WORKSPACE SPLIT AREA ================= -->
+  <main class="flex-1 flex overflow-hidden">
+    
+    <!-- LEFT PANE: Problem Description, Hints -->
+    <section id="left-pane" class="h-full flex flex-col bg-warmBg border-r border-warmBorder min-w-[320px]">
+      <!-- Left Tabs -->
+      <div class="h-10 bg-warmPanel border-b border-warmBorder flex items-center justify-between px-3 shrink-0">
+        <div class="flex space-x-2 text-xs">
+          <button id="tab-desc" class="tab-active px-3 py-2 text-warmText font-semibold transition flex items-center space-x-1.5">
+            <i class="fa-regular fa-file-lines"></i>
+            <span>Description</span>
+          </button>
+        </div>
+
+        <span id="problem-difficulty-badge" class="text-[11px] font-semibold px-2 py-0.5 rounded bg-amber-100 text-amber-900 border border-amber-300">
+          Easy
+        </span>
+      </div>
+
+      <!-- Left Tab Content Area -->
+      <div class="flex-1 overflow-y-auto p-5 space-y-4">
+        <!-- Description Content -->
+        <div id="content-desc" class="space-y-4">
+          <div class="border-b border-warmBorder pb-3">
+            <span class="text-[11px] font-bold tracking-wider text-warmMuted uppercase">CODING</span>
+            <h2 id="problem-title" class="text-2xl font-bold text-warmText tracking-tight mt-0.5">Problem Description 1</h2>
+            <div class="w-14 h-1 bg-amber-600 rounded-full mt-2"></div>
+            <div id="problem-tags" class="flex flex-wrap gap-1.5 mt-2.5">
+              <!-- Tags rendered via JS -->
+            </div>
+          </div>
+
+          <div id="problem-markdown" class="markdown-body select-text">
+            <!-- Rendered Markdown + Math equations -->
+          </div>
+
+          <!-- Bottom Exam Navigation (< previous, next > matching screenshot) -->
+          <div class="pt-6 pb-2 border-t border-warmBorder flex items-center justify-between text-xs text-warmMuted font-medium select-none">
+            <button id="bottom-prev-btn" class="hover:text-warmText flex items-center gap-1.5 transition cursor-pointer">
+              <i class="fa-solid fa-chevron-left text-[10px]"></i>
+              <span>previous</span>
+            </button>
+            <button id="bottom-next-btn" class="hover:text-warmText flex items-center gap-1.5 transition cursor-pointer">
+              <span>next</span>
+              <i class="fa-solid fa-chevron-right text-[10px]"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- RIGHT PANE: Code Editor (Top) & Test / Console (Bottom) -->
+    <section id="right-pane" class="h-full flex flex-col flex-1 min-w-[360px]">
+      
+      <!-- TOP RIGHT: Monaco Editor -->
+      <div id="editor-pane" class="flex flex-col bg-[#21252b] min-h-[220px]">
+        <!-- Editor Header Bar -->
+        <div class="h-9 bg-[#1e2227] border-b border-[#2d3139] flex items-center justify-between px-3 text-xs shrink-0">
+          <div class="flex items-center space-x-2">
+            <i class="fa-brands fa-python text-[#8be9fd] text-sm"></i>
+            <span class="font-semibold text-[#f8f8f2]">solution.py</span>
+          </div>
+
+          <div class="flex items-center space-x-3 text-[#abb2bf] text-xs">
+            <span id="save-status" class="text-[11px] text-emerald-400 opacity-0 transition-opacity duration-300 flex items-center gap-1 font-medium">
+              <i class="fa-solid fa-cloud-arrow-up text-[10px]"></i> Saved
+            </span>
+            <span id="cursor-pos">Ln 1, Col 1</span>
+            <button id="format-code-btn" class="hover:text-white transition p-1" title="Format code">
+              <i class="fa-solid fa-align-left text-xs"></i>
+            </button>
+            <button id="copy-code-btn" class="hover:text-white transition p-1" title="Copy code">
+              <i class="fa-regular fa-copy text-xs"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- Monaco Container -->
+        <div class="flex-1 relative overflow-hidden bg-[#21252b]">
+          <div id="monaco-container"></div>
+        </div>
+      </div>
+
+      <!-- BOTTOM RIGHT: Test Cases & Execution Results -->
+      <div id="console-pane" class="flex flex-col bg-warmBg min-h-[36px] border-t border-warmBorder transition-all overflow-hidden">
+        <!-- Console Tabs Header -->
+        <div class="h-9 bg-warmPanel border-b border-warmBorder flex items-center justify-between px-3 shrink-0 select-none">
+          <div class="flex space-x-2 text-xs">
+            <button id="tab-testcases" class="tab-active px-3 py-1.5 text-warmText font-semibold transition flex items-center space-x-1.5">
+              <i class="fa-solid fa-vial"></i>
+              <span>Test Cases</span>
+            </button>
+            <button id="tab-results" class="px-3 py-1.5 text-warmTextSecondary font-medium hover:text-warmText transition flex items-center space-x-1.5">
+              <i class="fa-solid fa-square-poll-vertical"></i>
+              <span>Test Results</span>
+              <span id="results-badge" class="hidden text-[10px] px-1.5 py-0.2 rounded-full font-bold"></span>
+            </button>
+            <button id="tab-stdout" class="px-3 py-1.5 text-warmTextSecondary font-medium hover:text-warmText transition flex items-center space-x-1.5">
+              <i class="fa-solid fa-terminal"></i>
+              <span>Console Log</span>
+            </button>
+          </div>
+
+          <!-- Right side console tools & actions -->
+          <div class="flex items-center space-x-2 text-xs text-warmTextSecondary">
+            <!-- Reset Starter Code Button -->
+            <button id="reset-code-btn" class="px-2 py-1 rounded bg-warmCard hover:bg-warmHover border border-warmBorder text-warmText text-[11px] font-medium flex items-center space-x-1.5 transition" title="Reset current question to starter code">
+              <i class="fa-solid fa-rotate-left text-[10px]"></i>
+              <span>Reset Code</span>
+            </button>
+
+            <!-- View Solution Button -->
+            <button id="view-solution-btn" class="px-2 py-1 rounded bg-amber-100 hover:bg-amber-200 border border-amber-300 text-amber-900 text-[11px] font-semibold flex items-center space-x-1.5 transition" title="View reference solution">
+              <i class="fa-regular fa-lightbulb text-[10px]"></i>
+              <span>Solution</span>
+            </button>
+
+            <span class="text-warmBorder">|</span>
+
+            <span id="execution-time" class="hidden text-emerald-700 font-mono text-[11px] font-semibold"></span>
+            <button id="clear-console-btn" class="hover:text-warmText transition p-1" title="Clear console">
+              <i class="fa-solid fa-trash-can text-xs"></i>
+            </button>
+            <button id="toggle-console-btn" class="hover:text-warmText transition p-1 ml-0.5" title="Expand Console">
+              <i id="console-toggle-icon" class="fa-solid fa-chevron-up text-xs text-amber-800"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- Console Tab Body -->
+        <div class="flex-1 overflow-y-auto p-4 select-text">
+          
+          <!-- Test Cases Tab -->
+          <div id="content-testcases" class="space-y-3">
+            <div class="flex items-center space-x-2 overflow-x-auto pb-1" id="testcase-pills">
+              <!-- Testcase buttons (Case 1, Case 2, Custom...) rendered via JS -->
+            </div>            <!-- Active Testcase Input Viewer & Editor -->
+            <div id="testcase-input-container" class="space-y-2">
+              <div class="flex items-center justify-between text-xs text-warmTextSecondary">
+                <span>Input Parameters:</span>
+                <span id="custom-case-hint" class="hidden text-amber-800 font-medium text-[11px]">Editable Custom Case</span>
+              </div>
+              <textarea id="testcase-json-editor" class="w-full h-32 bg-[#21252b] border border-[#333842] rounded-lg p-2.5 font-mono text-xs text-[#f8f8f2] focus:outline-none focus:border-[#ff79c6] resize-y" spellcheck="false"></textarea>
+            </div>
+          </div>
+
+          <!-- Test Results Tab -->
+          <div id="content-results" class="hidden space-y-3">
+            <div id="results-summary-card" class="p-3 rounded-lg bg-warmCard border border-warmBorder flex items-center justify-between">
+              <div>
+                <span id="results-headline" class="text-sm font-bold text-warmText">Run code to see test results</span>
+                <p id="results-subtext" class="text-xs text-warmTextSecondary">Supports sample & hidden grading test suites.</p>
+              </div>
+              <div id="results-status-icon"></div>
+            </div>
+
+            <!-- Detailed Testcase Result Cards Container -->
+            <div id="results-cards-container" class="space-y-3">
+              <!-- Rendered via JS -->
+            </div>
+          </div>
+
+          <!-- Console Stdout Logs Tab -->
+          <div id="content-stdout" class="hidden font-mono text-xs space-y-1">
+            <div class="text-warmMuted">// Output from print(...) statements will appear here</div>
+            <pre id="stdout-output" class="text-[#50fa7b] whitespace-pre-wrap select-text bg-[#21252b] p-3 rounded-lg border border-[#333842] font-mono"></pre>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ================= SOLUTION MODAL ================= -->
+  <div id="solution-modal" class="fixed inset-0 bg-stone-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-[#1e2227] border border-[#333842] rounded-xl max-w-3xl w-full max-h-[90vh] flex flex-col shadow-2xl overflow-hidden">
+      <!-- Modal Header -->
+      <div class="h-12 px-4 border-b border-[#333842] flex items-center justify-between bg-[#181a1f] shrink-0">
+        <div class="flex items-center space-x-2">
+          <i class="fa-regular fa-lightbulb text-amber-400"></i>
+          <h3 id="modal-solution-title" class="text-sm font-bold text-white">Reference Solution</h3>
+        </div>
+        <button id="close-solution-modal" class="text-gray-400 hover:text-white text-lg">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <!-- Modal Body -->
+      <div class="p-5 overflow-y-auto space-y-4 flex-1 select-text bg-[#1e2227]">
+        <div class="p-3 rounded-lg bg-amber-500/10 border border-amber-500/30 text-amber-300 text-xs flex items-start space-x-2">
+          <i class="fa-solid fa-circle-info text-amber-400 mt-0.5"></i>
+          <span>Official reference implementation using NumPy mini-batch gradient descent and softmax cross-entropy.</span>
+        </div>
+        <pre class="bg-[#21252b] p-4 rounded-lg border border-[#333842] text-xs text-[#f8f8f2] font-mono overflow-x-auto"><code id="modal-solution-code" class="language-python"></code></pre>
+      </div>
+
+      <!-- Modal Footer -->
+      <div class="h-12 px-4 border-t border-[#333842] bg-[#181a1f] flex items-center justify-end space-x-3 shrink-0">
+        <button id="insert-solution-btn" class="px-3.5 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold transition flex items-center space-x-1.5 shadow-sm">
+          <i class="fa-solid fa-file-import text-xs"></i>
+          <span>Copy to Editor</span>
+        </button>
+        <button id="dismiss-solution-btn" class="px-3.5 py-1.5 rounded-lg bg-[#282c34] hover:bg-[#333842] border border-[#3e4451] text-gray-200 text-xs font-medium transition">
+          Close
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- App Scripts with cache busting -->
+  <script src="questions.js?v=38.0"></script>
+  <script src="app.js?v=38.0"></script>
+</body>
+</html>
