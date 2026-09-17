@@ -1,0 +1,332 @@
+/* =========================================================================
+   CODING ARENA - LIGHT YELLOW NIGHT MODE THEME
+   Warm paper, eye-care, plain normal text coding environment
+   ========================================================================= */
+
+:root {
+  --bg-primary: #faf6eb;      /* Soft warm light yellow / cream */
+  --bg-secondary: #f3ecdb;    /* Slightly deeper warm cream */
+  --bg-panel: #f7f1e1;        /* Main panel surfaces */
+  --bg-card: #fdfbf7;         /* Card / Editor / Input background */
+  --bg-hover: #ebe3cf;        /* Hover state */
+  --border-color: #dfd5c0;    /* Warm subtle border */
+  --border-dark: #ccbfab;     /* Emphasized border */
+  
+  --text-primary: #2d271e;    /* Deep warm charcoal / dark brown text */
+  --text-secondary: #5f5748;  /* Secondary text */
+  --text-muted: #857966;      /* Muted helper text */
+  
+  --accent-amber: #b45309;
+  --accent-blue: #0284c7;
+  --accent-green: #15803d;
+  --accent-rose: #b91c1c;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  height: 100vh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Custom Scrollbars */
+::-webkit-scrollbar {
+  width: 7px;
+  height: 7px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg-primary);
+}
+
+::-webkit-scrollbar-thumb {
+  background: #d8cdb7;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #bfb299;
+}
+
+/* Split Panes */
+.gutter {
+  background-color: var(--border-color);
+  background-repeat: no-repeat;
+  background-position: 50%;
+  transition: background-color 0.2s ease;
+  z-index: 20;
+}
+
+.gutter:hover {
+  background-color: #b45309;
+}
+
+.gutter.gutter-horizontal {
+  cursor: col-resize;
+  width: 6px !important;
+}
+
+.gutter.gutter-vertical {
+  cursor: row-resize;
+  height: 6px !important;
+}
+
+/* Slidebar Drawer Styling */
+#slidebar {
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 350px;
+  max-width: 90vw;
+  background: var(--bg-secondary);
+  border-right: 1px solid var(--border-color);
+  z-index: 60;
+  transform: translateX(-100%);
+  transition: transform 0.25s ease-in-out;
+  box-shadow: 4px 0 24px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+}
+
+#slidebar.open {
+  transform: translateX(0);
+}
+
+.slidebar-filter-btn {
+  background: var(--bg-card);
+  color: var(--text-secondary);
+  border: 1px solid var(--border-color);
+}
+
+.slidebar-filter-btn:hover {
+  background: var(--bg-hover);
+  color: var(--text-primary);
+}
+
+.slidebar-filter-btn.active {
+  background: #fde68a !important;
+  color: #78350f !important;
+  border-color: #f59e0b !important;
+  font-weight: 700 !important;
+}
+
+#slidebar-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(45, 39, 30, 0.35);
+  z-index: 55;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.25s ease-in-out;
+}
+
+#slidebar-overlay.active {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* Tab Navigation styling */
+.test-tab-btn {
+  padding: 8px 16px;
+  font-size: 13px;
+  font-weight: 600;
+  border-bottom: 2px solid transparent;
+  color: var(--text-secondary);
+  transition: all 0.15s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+}
+
+.test-tab-btn:hover {
+  color: var(--text-primary);
+  background: var(--bg-hover);
+}
+
+.test-tab-btn.active {
+  color: #92400e;
+  border-bottom-color: #92400e;
+  background: #fbf7ec;
+}
+
+/* Plain Normal Text Typography - Highly Optimized */
+.markdown-body {
+  color: var(--text-primary);
+  font-size: 14.5px;
+  line-height: 1.7;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, Roboto, "Helvetica Neue", Arial, sans-serif;
+  user-select: text !important;
+}
+
+.markdown-body h1,
+.markdown-body h2,
+.markdown-body h3,
+.markdown-body h4 {
+  color: #241d13;
+  margin-top: 18px;
+  margin-bottom: 8px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+.markdown-body h3 {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #78350f;
+  border-bottom: 1.5px solid var(--border-color);
+  padding-bottom: 5px;
+  margin-top: 22px;
+}
+
+.markdown-body h4 {
+  font-size: 0.95rem;
+  color: #92400e;
+  margin-top: 14px;
+}
+
+.markdown-body p {
+  margin-bottom: 12px;
+  font-size: 14.5px;
+  line-height: 1.7;
+  color: var(--text-primary);
+}
+
+.markdown-body hr {
+  border: none;
+  border-top: 1px solid var(--border-color);
+  margin: 16px 0;
+}
+
+.markdown-body ol,
+.markdown-body ul {
+  padding-left: 20px;
+  margin: 12px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.markdown-body ol > li,
+.markdown-body ul > li {
+  font-size: 13.5px;
+  color: var(--text-primary);
+  line-height: 1.6;
+}
+
+/* Colorful Inline Code */
+.markdown-body code:not(pre code) {
+  background-color: #f5eedc;
+  color: #9a3412;
+  border: 1px solid #e2d4bc;
+  padding: 2px 6px;
+  border-radius: 5px;
+  font-size: 12.5px;
+  font-family: 'Fira Code', 'Cascadia Code', Consolas, monospace;
+  font-weight: 600;
+}
+
+/* Colorful Pre & Code Blocks matching User's Image */
+.markdown-body pre,
+#modal-solution-code,
+pre.code-dark-block {
+  background-color: #21252b !important;
+  color: #f8f8f2 !important;
+  border: 1px solid #333842 !important;
+  border-radius: 8px;
+  padding: 14px 16px;
+  overflow-x: auto;
+  margin: 12px 0;
+  font-family: 'Fira Code', 'Cascadia Code', Consolas, monospace;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.markdown-body pre code {
+  color: #f8f8f2 !important;
+  font-size: 13px;
+  line-height: 1.6;
+  font-family: 'Fira Code', 'Cascadia Code', Consolas, monospace;
+}
+
+/* Highlight.js Colorful Tokens matching Screenshot */
+.hljs {
+  background: #21252b !important;
+  color: #f8f8f2 !important;
+}
+.hljs-keyword, .hljs-built_in {
+  color: #ff79c6 !important; /* Vibrant Pink / Magenta like 'import', 'while', 'if', 'def' */
+  font-weight: 700;
+}
+.hljs-type, .hljs-class {
+  color: #8be9fd !important; /* Cyan / Sky Blue like 'String', 'int' */
+  font-weight: 600;
+}
+.hljs-function, .hljs-title {
+  color: #50fa7b !important; /* Vibrant Green like 'Main', function names */
+  font-weight: 600;
+}
+.hljs-string {
+  color: #f1fa8c !important; /* Vibrant Yellow like '"Palindrome"' */
+}
+.hljs-number {
+  color: #ffb86c !important; /* Vibrant Orange/Peach like '0', '10' */
+  font-weight: 600;
+}
+.hljs-comment {
+  color: #6272a4 !important; /* Italic Slate Grey like '// int digit=0;' */
+  font-style: italic;
+}
+.hljs-operator {
+  color: #ff79c6 !important; /* Vibrant Pink like '=', '>', '%', '*' */
+  font-weight: 700;
+}
+.hljs-variable, .hljs-params {
+  color: #f8f8f2 !important; /* Crisp White */
+}
+
+/* KaTeX Clean Light Night-Mode Equations */
+.katex {
+  font-size: 1.06em;
+  color: #1e1b18;
+}
+
+.katex-display-box {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  padding: 4px 0 !important;
+  margin: 6px 0 !important;
+}
+
+.katex-display {
+  margin: 0.4em 0;
+  overflow-x: auto;
+  overflow-y: hidden;
+}
+
+/* Monaco Editor Container */
+#monaco-container {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: #fdfbf7;
+}
+
+/* Tab active indicator in left and console panels */
+.tab-active {
+  color: #92400e !important;
+  border-bottom: 2px solid #92400e !important;
+  background-color: rgba(180, 83, 9, 0.08);
+}

@@ -1,0 +1,10 @@
+services:
+  - type: web
+    name: ai-coding-arena
+    env: docker
+    plan: free
+    region: oregon
+    dockerfilePath: ./Dockerfile
+    envVars:
+      - key: PORT
+        value: 3090
